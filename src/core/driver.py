@@ -79,7 +79,11 @@ class DriverManager(AbstractContextManager):
         options.add_argument("--no-sandbox")
         if self.config.user_agent:
             options.add_argument(f"--user-agent={self.config.user_agent}")
-        prefs = {}
+        prefs = {
+            "credentials_enable_service": False,
+            "profile.password_manager_enabled": False,
+            "profile.password_manager_leak_detection": False,
+        }
         if self.config.download_dir:
             prefs["download.default_directory"] = self.config.download_dir
             prefs["download.prompt_for_download"] = False
