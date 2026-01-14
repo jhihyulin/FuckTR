@@ -1,0 +1,10 @@
+[
+  {
+    "type": "forward",
+    "name": "順行"
+  },
+  {
+    "type": "reverse",
+    "name": "逆行"
+  }
+]
