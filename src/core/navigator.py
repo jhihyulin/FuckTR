@@ -1,4 +1,4 @@
-"""處理頁面跳轉、等待元素、基礎 DOM 操作。"""
+"""處理頁面跳轉、等待元素、基礎 DOM 操作"""
 
 import logging
 from typing import Optional, Tuple

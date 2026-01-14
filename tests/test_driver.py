@@ -1,4 +1,4 @@
-"""簡單啟動/關閉的 smoke 測試。"""
+"""簡單啟動/關閉的 smoke 測試"""
 
 import pytest
 

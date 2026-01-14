@@ -1,4 +1,4 @@
-"""定義資料模型與設定 dataclass。"""
+"""定義資料模型與設定 dataclass"""
 
 from dataclasses import dataclass, field
 from typing import Optional, Tuple

@@ -1,4 +1,4 @@
-"""封裝 undetected_chromedriver 的初始化與生命週期管理。"""
+"""封裝 undetected_chromedriver 的初始化與生命週期管理"""
 
 import logging
 import time
