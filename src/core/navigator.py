@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 
 from ..utils.logger import get_logger
 
@@ -38,6 +39,11 @@ class Navigator:
         to = timeout or self.default_wait
         by, value = locator
         return WebDriverWait(self.driver, to).until(EC.presence_of_element_located((by, value)))
+
+    def wait_for_all(self, locator: Locator, timeout: Optional[int] = None):
+        to = timeout or self.default_wait
+        by, value = locator
+        return WebDriverWait(self.driver, to).until(EC.presence_of_all_elements_located((by, value)))
 
     def wait_clickable(self, locator: Locator, timeout: Optional[int] = None):
         to = timeout or self.default_wait
@@ -118,6 +124,17 @@ class Navigator:
         except TimeoutException:
             self.logger.warning("Element did not disappear: %s", locator)
             return False
+
+    def select_dropdown_by_value(self, locator: Locator, value: str, timeout: Optional[int] = None):
+        """透過值選擇下拉選單選項"""
+        try:
+            el = self.wait_for(locator, timeout)
+            select = Select(el)
+            select.select_by_value(value)
+            return el
+        except TimeoutException as exc:
+            self.logger.error("Select dropdown timeout: %s", locator)
+            raise exc
 
     @staticmethod
     def by_css(selector: str) -> Locator:
