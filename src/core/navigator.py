@@ -64,6 +64,61 @@ class Navigator:
             self.logger.error("Fill timeout: %s", locator)
             raise exc
 
+    def wait_for_url(self, expected_url: str, timeout: Optional[int] = None) -> bool:
+        """等待 URL 變更到指定的 URL"""
+        to = timeout or self.default_wait
+        try:
+            WebDriverWait(self.driver, to).until(
+                lambda d: d.current_url == expected_url
+            )
+            return True
+        except TimeoutException:
+            return False
+
+    def wait_for_url_or_element(self, expected_url: str, locator: Locator, timeout: Optional[int] = None) -> str:
+        """等待 URL 變更或元素出現，返回 'url' 或 'element'"""
+        to = timeout or self.default_wait
+        by, value = locator
+        try:
+            WebDriverWait(self.driver, to).until(
+                lambda d: d.current_url == expected_url or d.find_elements(
+                    by, value)
+            )
+            if self.driver.current_url == expected_url:
+                return 'url'
+            else:
+                return 'element'
+        except TimeoutException as exc:
+            self.logger.error(
+                "Timeout waiting for URL '%s' or element '%s'", expected_url, locator)
+            raise exc
+
+    def get_current_url(self) -> str:
+        """取得當前頁面 URL"""
+        return self.driver.current_url
+
+    def get_element_text(self, locator: Locator, timeout: Optional[int] = None) -> Optional[str]:
+        """取得元素的文字內容"""
+        try:
+            el = self.wait_for(locator, timeout)
+            return el.text
+        except TimeoutException:
+            self.logger.warning("Element not found: %s", locator)
+            return None
+
+    def wait_for_element_disappear(self, locator: Locator, timeout: Optional[int] = None) -> bool:
+        """等待元素消失"""
+        to = timeout or self.default_wait
+        by, value = locator
+        try:
+            WebDriverWait(self.driver, to).until(
+                EC.invisibility_of_element_located((by, value))
+            )
+            return True
+        except TimeoutException:
+            self.logger.warning("Element did not disappear: %s", locator)
+            return False
+
     @staticmethod
     def by_css(selector: str) -> Locator:
         return (By.CSS_SELECTOR, selector)
