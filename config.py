@@ -10,8 +10,9 @@ from typing import Tuple
 
 # 票務輪詢間隔（秒）
 config = {
-    "random_pause": False,
+    "random_interval_pause": False,
     "random_interval": [3, 10],
+    "random_interval_long_pause": True,
     "random_interval_long": [10, 25],
 }
 

@@ -152,7 +152,7 @@ class Navigator:
 
     def random_pause(self):
         """隨機暫停一段時間以模擬人類行為"""
-        if not config.get("random_pause", True):
+        if not config.get("random_interval_pause", True):
             return
         interval = config.get("random_interval")
         delay = random.uniform(interval[0], interval[1])
@@ -161,6 +161,8 @@ class Navigator:
 
     def random_pause_long(self):
         """進行較長時間的隨機暫停"""
+        if not config.get("random_interval_long_pause", True):
+            return
         interval = config.get("random_interval_long")
         delay = random.uniform(interval[0], interval[1])
         self.logger.info(f"Random long pause for {delay:.2f} seconds")
