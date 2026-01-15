@@ -59,6 +59,17 @@ class Navigator:
             self.logger.error("Click timeout: %s", locator)
             raise exc
 
+    def click_element(self, element):
+        try:
+            WebDriverWait(self.driver, self.default_wait).until(
+                EC.element_to_be_clickable(element)
+            )
+            element.click()
+            return element
+        except TimeoutException as exc:
+            self.logger.error("Click element timeout")
+            raise exc
+
     def fill(self, locator: Locator, text: str, clear: bool = True, timeout: Optional[int] = None):
         try:
             el = self.wait_for(locator, timeout)
