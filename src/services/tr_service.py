@@ -147,6 +147,20 @@ class TRService:
         self.logger.info("Cancelling order: %s", ordernum)
         try:
             self._query_orders_wait_pay()
+            # 先找 class "alert alert-warning"
+            # 若子物件 <p> 內容為 「[查無資料]」，表示無訂單 無法取消
+            alert_text = self.navigator.get_element_text(
+                Navigator.by_css(".alert.alert-warning p"), timeout=2)
+            if alert_text and "[查無資料]" in alert_text:
+                self.logger.warning(
+                    "No orders found. Cannot cancel order: %s", ordernum)
+                raise Exception("找不到指定訂單")
+            # 錯誤踢出去
+            if alert_text:
+                self.logger.warning(
+                    "Unexpected alert message while fetching orders: %s", alert_text)
+                raise Exception("Unexpected alert message")
+            order_btn = None
             # 找到對應訂單的取消按鈕並點擊
             rows = self.navigator.wait_for_all(
                 Navigator.by_css(".table.record-table tbody tr"))
@@ -196,3 +210,16 @@ class TRService:
             self.logger.error("Error cancelling order %s: %s", ordernum, e)
             raise e
         return False
+
+    def cancel_orders_with_ordernum(self, ordernums: list) -> dict:
+        """批次取消多個訂單"""
+        results = {}
+        for ordernum in ordernums:
+            try:
+                result = self.cancel_order_with_ordernum(ordernum)
+                results[ordernum] = result
+            except Exception as e:
+                self.logger.error(
+                    "Error cancelling order %s: %s", ordernum, e)
+                results[ordernum] = False
+        return results
