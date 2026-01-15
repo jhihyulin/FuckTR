@@ -1,5 +1,7 @@
 """處理頁面跳轉、等待元素、基礎 DOM 操作"""
 
+import time
+import random
 import logging
 from typing import Optional, Tuple
 
@@ -11,6 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 
 from ..utils.logger import get_logger
+from config import config
 
 
 Locator = Tuple[str, str]
@@ -146,6 +149,22 @@ class Navigator:
         except TimeoutException as exc:
             self.logger.error("Select dropdown timeout: %s", locator)
             raise exc
+
+    def random_pause(self):
+        """隨機暫停一段時間以模擬人類行為"""
+        if not config.get("random_pause", True):
+            return
+        interval = config.get("random_interval")
+        delay = random.uniform(interval[0], interval[1])
+        self.logger.info("Random pause for %.2f seconds", delay)
+        time.sleep(delay)
+
+    def random_pause_long(self):
+        """進行較長時間的隨機暫停"""
+        interval = config.get("random_interval_long")
+        delay = random.uniform(interval[0], interval[1])
+        self.logger.info("Random long pause for %.2f seconds", delay)
+        time.sleep(delay)
 
     @staticmethod
     def by_css(selector: str) -> Locator:

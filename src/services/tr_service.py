@@ -36,6 +36,7 @@ class TRService:
             self.navigator.wait_clickable(Navigator.by_css("#password"))
             self.logger.debug("Filling in password")
             self.navigator.fill(Navigator.by_css("#password"), password)
+            self.navigator.random_pause()
             self.navigator.wait_clickable(Navigator.by_css("#submitBtn"))
             self.logger.debug("Submitting login form")
             self.navigator.click(Navigator.by_css("#submitBtn"))
@@ -83,6 +84,7 @@ class TRService:
         self.logger.debug("Selecting 未付款 in dropdown")
         self.navigator.select_dropdown_by_value(
             Navigator.by_css("#personOrderStatus"), "ODS1")
+        self.navigator.random_pause()
         # 點 submitdiv 子物件 <button>
         self.navigator.wait_clickable(
             Navigator.by_css("#submitdiv button"))
@@ -104,6 +106,7 @@ class TRService:
         orders = []
         try:
             self._query_orders_wait_pay()
+            self.navigator.random_pause()
             # 先找 class "alert alert-warning"
             # 若子物件 <p> 內容為 「[查無資料]」，表示無訂單 回傳空列表
             alert_text = self.navigator.get_element_text(
@@ -147,6 +150,7 @@ class TRService:
         self.logger.info("Cancelling order: %s", ordernum)
         try:
             self._query_orders_wait_pay()
+            self.navigator.random_pause()
             # 先找 class "alert alert-warning"
             # 若子物件 <p> 內容為 「[查無資料]」，表示無訂單 無法取消
             alert_text = self.navigator.get_element_text(
@@ -161,7 +165,7 @@ class TRService:
                     "Unexpected alert message while fetching orders: %s", alert_text)
                 raise Exception("Unexpected alert message")
             order_btn = None
-            # 找到對應訂單的取消按鈕並點擊
+            # 找到對應訂單的按鈕並點擊
             rows = self.navigator.wait_for_all(
                 Navigator.by_css(".table.record-table tbody tr"))
             for row in rows:
@@ -179,6 +183,7 @@ class TRService:
                 self.logger.warning(
                     "Order %s not found for cancellation", ordernum)
                 return False
+            self.navigator.random_pause()
             # 點進入訂單詳情頁
             self.navigator.click_element(order_btn)
             self.logger.debug(
@@ -190,6 +195,7 @@ class TRService:
                 Navigator.by_css("#cancel"))
             self.logger.debug("Clicking cancel button for order %s", ordernum)
             self.navigator.click(Navigator.by_css("#cancel"))
+            self.navigator.random_pause()
             # 確認取消 class "btn btn-danger"
             self.navigator.wait_clickable(
                 Navigator.by_css(".btn.btn-danger"))
@@ -218,6 +224,8 @@ class TRService:
             try:
                 result = self.cancel_order_with_ordernum(ordernum)
                 results[ordernum] = result
+                if ordernum != ordernums[-1]:
+                    self.navigator.random_pause_long()
             except Exception as e:
                 self.logger.error(
                     "Error cancelling order %s: %s", ordernum, e)
