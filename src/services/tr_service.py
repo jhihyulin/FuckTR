@@ -19,7 +19,7 @@ class TRService:
 
     def login(self, username: str, password: str) -> bool:
         """登入臺鐵系統"""
-        self.logger.info("Attempting to log in user: %s", username)
+        self.logger.info(f"Attempting to log in user: {username}")
         try:
             # 填寫登入表單並提交
             self.navigator.go_to(
@@ -51,21 +51,21 @@ class TRService:
                     # 登入成功
                     self.is_logged_in = True
                     self.user_info = {"username": username}
-                    self.logger.info("Login successful for user: %s", username)
+                    self.logger.info(f"Login successful for user: {username}")
                     return True
                 else:
                     # 登入失敗，取得錯誤訊息
                     error_msg = self.navigator.get_element_text(Navigator.by_css(
                         "#errDiv.info-error p.mag-error")) or "Unknown error"
                     self.logger.warning(
-                        "Login failed for user %s: %s", username, error_msg)
+                        f"Login failed for user {username}: {error_msg}")
                     return False
             except TimeoutException:
-                self.logger.error("Login timeout for user: %s", username)
+                self.logger.error(f"Login timeout for user: {username}")
                 return False
         except Exception as e:
             self.logger.error(
-                "Error during login for user %s: %s", username, e)
+                f"Error during login for user {username}: {e}")
             return False
 
     def _query_orders_wait_pay(self):
@@ -117,14 +117,14 @@ class TRService:
             # 錯誤踢出去
             if alert_text:
                 self.logger.warning(
-                    "Unexpected alert message while fetching orders: %s", alert_text)
+                    f"Unexpected alert message while fetching orders: {alert_text}")
                 raise Exception("Unexpected alert message")
             # 解析訂單列表
             # class"table record-table" 子物件 <tbody> 內的 <tr> 為訂單列
             # 乘車日期	訂票代碼	車廂類型	車次	起訖站	票數	訂單狀態	付款狀態	備註
             rows = self.navigator.wait_for_all(
                 Navigator.by_css(".table.record-table tbody tr"))
-            self.logger.debug("Found %d order rows", len(rows))
+            self.logger.debug(f"Found {len(rows)} order rows")
             # 僅蒐集訂票代碼
             for row in rows:
                 # 略過表頭
@@ -135,9 +135,9 @@ class TRService:
                 order_code = cols[1].find_element(
                     By.TAG_NAME, "button").text.strip()
                 orders.append(order_code)
-                self.logger.debug("Found order code: %s", order_code)
+                self.logger.debug(f"Found order code: {order_code}")
         except Exception as e:
-            self.logger.error("Error fetching orders: %s", e)
+            self.logger.error(f"Error fetching orders: {e}")
             raise e
         return orders
 
@@ -147,7 +147,7 @@ class TRService:
         if not self.is_logged_in:
             self.logger.warning("User not logged in. Cannot fetch orders.")
             raise Exception("User not logged in")
-        self.logger.info("Cancelling order: %s", ordernum)
+        self.logger.info(f"Cancelling order: {ordernum}")
         try:
             self._query_orders_wait_pay()
             self.navigator.random_pause()
@@ -157,12 +157,12 @@ class TRService:
                 Navigator.by_css(".alert.alert-warning p"), timeout=2)
             if alert_text and "[查無資料]" in alert_text:
                 self.logger.warning(
-                    "No orders found. Cannot cancel order: %s", ordernum)
+                    f"No orders found. Cannot cancel order: {ordernum}")
                 raise Exception("找不到指定訂單")
             # 錯誤踢出去
             if alert_text:
                 self.logger.warning(
-                    "Unexpected alert message while fetching orders: %s", alert_text)
+                    f"Unexpected alert message while fetching orders: {alert_text}")
                 raise Exception("Unexpected alert message")
             order_btn = None
             # 找到對應訂單的按鈕並點擊
@@ -177,29 +177,29 @@ class TRService:
                     By.TAG_NAME, "button").text.strip()
                 if current_order_code == ordernum:
                     order_btn = cols[1].find_element(By.TAG_NAME, "button")
-                    self.logger.debug("Found button for order %s", ordernum)
+                    self.logger.debug(f"Found button for order {ordernum}")
                     break
             if not order_btn:
                 self.logger.warning(
-                    "Order %s not found for cancellation", ordernum)
+                    f"Order {ordernum} not found for cancellation")
                 return False
             self.navigator.random_pause()
             # 點進入訂單詳情頁
             self.navigator.click_element(order_btn)
             self.logger.debug(
-                "Navigated to order detail page for %s", ordernum)
+                f"Navigated to order detail page for {ordernum}")
             # 等待詳情頁載入
             self.navigator.wait_ready()
             # 點取消訂單按鈕
             self.navigator.wait_clickable(
                 Navigator.by_css("#cancel"))
-            self.logger.debug("Clicking cancel button for order %s", ordernum)
+            self.logger.debug(f"Clicking cancel button for order {ordernum}")
             self.navigator.click(Navigator.by_css("#cancel"))
             self.navigator.random_pause()
             # 確認取消 class "btn btn-danger"
             self.navigator.wait_clickable(
                 Navigator.by_css(".btn.btn-danger"))
-            self.logger.debug("Confirming cancellation for order %s", ordernum)
+            self.logger.debug(f"Confirming cancellation for order {ordernum}")
             self.navigator.click(Navigator.by_css(".btn.btn-danger"))
             # 等待取消完成
             self.navigator.wait_ready()
@@ -207,13 +207,13 @@ class TRService:
             alert_text = self.navigator.get_element_text(
                 Navigator.by_css(".alert.alert-warning p"), timeout=5)
             if alert_text and "已成功取消" in alert_text:
-                self.logger.info("Order %s cancelled successfully", ordernum)
+                self.logger.info(f"Order {ordernum} cancelled successfully")
                 return True
             else:
                 self.logger.warning(
-                    "Cancellation of order %s may have failed", ordernum)
+                    f"Cancellation of order {ordernum} may have failed")
         except Exception as e:
-            self.logger.error("Error cancelling order %s: %s", ordernum, e)
+            self.logger.error(f"Error cancelling order {ordernum}: {e}")
             raise e
         return False
 
@@ -228,6 +228,6 @@ class TRService:
                     self.navigator.random_pause_long()
             except Exception as e:
                 self.logger.error(
-                    "Error cancelling order %s: %s", ordernum, e)
+                    f"Error cancelling order {ordernum}: {e}")
                 results[ordernum] = False
         return results

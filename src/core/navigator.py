@@ -26,7 +26,7 @@ class Navigator:
         self.logger = logger or get_logger(__name__)
 
     def go_to(self, url: str, wait_ready: bool = True, timeout: Optional[int] = None):
-        self.logger.info("Navigate to %s", url)
+        self.logger.info(f"Navigate to {url}")
         self.driver.get(url)
         if wait_ready:
             self.wait_ready(timeout=timeout)
@@ -59,7 +59,7 @@ class Navigator:
             el.click()
             return el
         except TimeoutException as exc:
-            self.logger.error("Click timeout: %s", locator)
+            self.logger.error(f"Click timeout: {locator}")
             raise exc
 
     def click_element(self, element):
@@ -81,7 +81,7 @@ class Navigator:
             el.send_keys(text)
             return el
         except TimeoutException as exc:
-            self.logger.error("Fill timeout: %s", locator)
+            self.logger.error(f"Fill timeout: {locator}")
             raise exc
 
     def wait_for_url(self, expected_url: str, timeout: Optional[int] = None) -> bool:
@@ -110,7 +110,7 @@ class Navigator:
                 return 'element'
         except TimeoutException as exc:
             self.logger.error(
-                "Timeout waiting for URL '%s' or element '%s'", expected_url, locator)
+                f"Timeout waiting for URL '{expected_url}' or element '{locator}'")
             raise exc
 
     def get_current_url(self) -> str:
@@ -123,7 +123,7 @@ class Navigator:
             el = self.wait_for(locator, timeout)
             return el.text
         except TimeoutException:
-            self.logger.warning("Element not found: %s", locator)
+            self.logger.warning(f"Element not found: {locator}")
             return None
 
     def wait_for_element_disappear(self, locator: Locator, timeout: Optional[int] = None) -> bool:
@@ -136,7 +136,7 @@ class Navigator:
             )
             return True
         except TimeoutException:
-            self.logger.warning("Element did not disappear: %s", locator)
+            self.logger.warning(f"Element did not disappear: {locator}")
             return False
 
     def select_dropdown_by_value(self, locator: Locator, value: str, timeout: Optional[int] = None):
@@ -147,7 +147,7 @@ class Navigator:
             select.select_by_value(value)
             return el
         except TimeoutException as exc:
-            self.logger.error("Select dropdown timeout: %s", locator)
+            self.logger.error(f"Select dropdown timeout: {locator}")
             raise exc
 
     def random_pause(self):
@@ -156,14 +156,14 @@ class Navigator:
             return
         interval = config.get("random_interval")
         delay = random.uniform(interval[0], interval[1])
-        self.logger.info("Random pause for %.2f seconds", delay)
+        self.logger.info(f"Random pause for {delay:.2f} seconds")
         time.sleep(delay)
 
     def random_pause_long(self):
         """進行較長時間的隨機暫停"""
         interval = config.get("random_interval_long")
         delay = random.uniform(interval[0], interval[1])
-        self.logger.info("Random long pause for %.2f seconds", delay)
+        self.logger.info(f"Random long pause for {delay:.2f} seconds")
         time.sleep(delay)
 
     @staticmethod

@@ -40,7 +40,7 @@ class DriverManager(AbstractContextManager):
         for attempt in range(1, self.config.retry.attempts + 1):
             try:
                 options = self._build_options()
-                self.logger.info("Starting Chrome (attempt %s)", attempt)
+                self.logger.info(f"Starting Chrome (attempt {attempt})")
                 driver = uc.Chrome(options=options)
                 self._apply_timeouts(driver)
                 self.driver = driver
@@ -48,10 +48,10 @@ class DriverManager(AbstractContextManager):
                 return self.driver
             except WebDriverException as exc:  # pragma: no cover - depends on env
                 self.logger.warning(
-                    "Chrome start failed: %s", exc, exc_info=False)
+                    f"Chrome start failed: {exc}", exc_info=False)
                 if attempt >= self.config.retry.attempts:
                     self.logger.error(
-                        "Chrome failed after %s attempts", attempt)
+                        f"Chrome failed after {attempt} attempts")
                     raise
                 time.sleep(delay)
                 delay *= self.config.retry.backoff
@@ -64,7 +64,7 @@ class DriverManager(AbstractContextManager):
             self.logger.info("Quitting Chrome")
             self.driver.quit()
         except Exception as exc:  # pragma: no cover - best-effort
-            self.logger.warning("Error during quit: %s", exc, exc_info=False)
+            self.logger.warning(f"Error during quit: {exc}", exc_info=False)
         finally:
             self.driver = None
 

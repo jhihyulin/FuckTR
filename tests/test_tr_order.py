@@ -21,7 +21,7 @@ def test_tr_order_wait_pay(login_fixture):
         assert isinstance(order_code, str)
         assert len(order_code) == 7
         assert order_code.isdigit()
-    print("待付款訂單代碼列表:", orders)
+    print(f"待付款訂單代碼列表: {orders}")
 
 
 @pytest.mark.tr_order_cancel
