@@ -24,27 +24,27 @@ class TRService:
             # 填寫登入表單並提交
             self.navigator.go_to(
                 "https://www.railway.gov.tw/tra-tip-web/tip/tip008/tip811/memberLogin", wait_ready=True)
-            self.logger.debug("Login page loaded")
+            self.logger.info("Login page loaded")
             # 等 class "blockUI blockOverlay" 消失
             self.navigator.wait_for_element_disappear(
                 Navigator.by_css(".blockUI.blockOverlay"))
-            self.logger.debug("BlockUI overlay disappeared")
+            self.logger.info("BlockUI overlay disappeared")
             # 填寫帳號密碼
             self.navigator.wait_clickable(Navigator.by_css("#username"))
-            self.logger.debug("Filling in username")
+            self.logger.info("Filling in username")
             self.navigator.fill(Navigator.by_css("#username"), username)
             self.navigator.wait_clickable(Navigator.by_css("#password"))
-            self.logger.debug("Filling in password")
+            self.logger.info("Filling in password")
             self.navigator.fill(Navigator.by_css("#password"), password)
             self.navigator.random_pause()
             self.navigator.wait_clickable(Navigator.by_css("#submitBtn"))
-            self.logger.debug("Submitting login form")
+            self.logger.info("Submitting login form")
             self.navigator.click(Navigator.by_css("#submitBtn"))
             # 檢查登入失敗/成功
             success_url = "https://www.railway.gov.tw/tra-tip-web/tip/tip008/tip841/tip841profile"
             error_locator = Navigator.by_css("#errDiv.info-error")
             try:
-                self.logger.debug("Waiting for login result")
+                self.logger.info("Waiting for login result")
                 result = self.navigator.wait_for_url_or_element(
                     success_url, error_locator, timeout=10)
                 if result == 'url':
@@ -72,29 +72,29 @@ class TRService:
         """內部方法：查詢待付款訂單"""
         self.navigator.go_to(
             "https://www.railway.gov.tw/tra-tip-web/tip/tip008/tip851/personView", wait_ready=True)
-        self.logger.debug("Order search page loaded")
+        self.logger.info("Order search page loaded")
         # 輸入查詢條件並提交
         self.navigator.wait_clickable(
             Navigator.by_css("#queryField"))
-        self.logger.debug("Selecting 訂單狀態 in dropdown")
+        self.logger.info("Selecting 訂單狀態 in dropdown")
         self.navigator.select_dropdown_by_value(
             Navigator.by_css("#queryField"), "ORDER_STATUS")
         self.navigator.wait_clickable(
             Navigator.by_css("#personOrderStatus"))
-        self.logger.debug("Selecting 未付款 in dropdown")
+        self.logger.info("Selecting 未付款 in dropdown")
         self.navigator.select_dropdown_by_value(
             Navigator.by_css("#personOrderStatus"), "ODS1")
         self.navigator.random_pause()
         # 點 submitdiv 子物件 <button>
         self.navigator.wait_clickable(
             Navigator.by_css("#submitdiv button"))
-        self.logger.debug("Submitting order query form")
+        self.logger.info("Submitting order query form")
         self.navigator.click(Navigator.by_css("#submitdiv button"))
         # 等待結果載入
         # 等 class "blockUI blockOverlay" 消失
         self.navigator.wait_for_element_disappear(
             Navigator.by_css(".blockUI.blockOverlay"))
-        self.logger.debug("BlockUI overlay disappeared")
+        self.logger.info("BlockUI overlay disappeared")
 
     def fetch_order_wait_pay(self) -> list:
         """取得未付款訂單列表"""
@@ -124,7 +124,7 @@ class TRService:
             # 乘車日期	訂票代碼	車廂類型	車次	起訖站	票數	訂單狀態	付款狀態	備註
             rows = self.navigator.wait_for_all(
                 Navigator.by_css(".table.record-table tbody tr"))
-            self.logger.debug(f"Found {len(rows)} order rows")
+            self.logger.info(f"Found {len(rows)} order rows")
             # 僅蒐集訂票代碼
             for row in rows:
                 # 略過表頭
@@ -135,7 +135,7 @@ class TRService:
                 order_code = cols[1].find_element(
                     By.TAG_NAME, "button").text.strip()
                 orders.append(order_code)
-                self.logger.debug(f"Found order code: {order_code}")
+                self.logger.info(f"Found order code: {order_code}")
         except Exception as e:
             self.logger.error(f"Error fetching orders: {e}")
             raise e
@@ -177,7 +177,7 @@ class TRService:
                     By.TAG_NAME, "button").text.strip()
                 if current_order_code == ordernum:
                     order_btn = cols[1].find_element(By.TAG_NAME, "button")
-                    self.logger.debug(f"Found button for order {ordernum}")
+                    self.logger.info(f"Found button for order {ordernum}")
                     break
             if not order_btn:
                 self.logger.warning(
@@ -186,20 +186,20 @@ class TRService:
             self.navigator.random_pause()
             # 點進入訂單詳情頁
             self.navigator.click_element(order_btn)
-            self.logger.debug(
+            self.logger.info(
                 f"Navigated to order detail page for {ordernum}")
             # 等待詳情頁載入
             self.navigator.wait_ready()
             # 點取消訂單按鈕
             self.navigator.wait_clickable(
                 Navigator.by_css("#cancel"))
-            self.logger.debug(f"Clicking cancel button for order {ordernum}")
+            self.logger.info(f"Clicking cancel button for order {ordernum}")
             self.navigator.click(Navigator.by_css("#cancel"))
             self.navigator.random_pause()
             # 確認取消 class "btn btn-danger"
             self.navigator.wait_clickable(
                 Navigator.by_css(".btn.btn-danger"))
-            self.logger.debug(f"Confirming cancellation for order {ordernum}")
+            self.logger.info(f"Confirming cancellation for order {ordernum}")
             self.navigator.click(Navigator.by_css(".btn.btn-danger"))
             # 等待取消完成
             self.navigator.wait_ready()
