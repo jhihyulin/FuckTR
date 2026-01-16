@@ -7,6 +7,7 @@ from src.core.driver import DriverManager
 from src.models.schemas import DriverConfig
 from src.services.tr_service import TRService
 from src.core.navigator import Navigator
+from src.models.schemas import OrderSeatPreference, BookOrderData
 
 
 @pytest.mark.tr_order_wait_pay
@@ -62,3 +63,31 @@ def test_tr_order_cancel_list(login_fixture):
     results = tr_service.cancel_orders_with_ordernum(orders)
     assert all(results.values()) is True
     print(f"已批次取消訂單代碼: {orders}")
+
+
+@pytest.mark.tr_order_with_trainnum
+@pytest.mark.timeout(180)
+def test_tr_order_with_trainnum(login_fixture):
+    """測試取得指定車次的待付款訂單"""
+    tr_service: TRService = login_fixture
+    start_station = "1000-臺北"
+    end_station = "6240-志學"
+    date = time.strftime("%Y/%m/%d", time.localtime(time.time() + 15 * 86400))
+    amount = 1
+    trainnum = "434"
+    seat_preference = OrderSeatPreference.WINDOW
+    order_data: BookOrderData = tr_service.order_with_trainnum(
+        start_station, end_station, date, amount, trainnum, seat_preference
+    )
+    assert isinstance(order_data, BookOrderData)
+    assert isinstance(order_data.ordernum, str)
+    assert len(order_data.ordernum) == 7
+    assert isinstance(order_data.carriage, str)
+    assert order_data.carriage.isdigit()
+    assert isinstance(order_data.seat, str)
+    assert any(char.isdigit() for char in order_data.seat)
+    assert isinstance(order_data.trainnum, str)
+    assert isinstance(order_data.traintype, str)
+    print(
+        f"成功下訂，訂單號碼: {order_data.ordernum}, 車次: {order_data.trainnum}, 車種: {order_data.traintype}, 車廂: {order_data.carriage}, 座位: {order_data.seat}"
+    )

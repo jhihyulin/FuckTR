@@ -1,7 +1,25 @@
 """定義資料模型與設定 dataclass"""
 
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Optional, Tuple
+
+
+class OrderSeatPreference(Enum):
+    """座位偏好"""
+    NONE = "none"
+    WINDOW = "window"
+    AISLE = "aisle"
+
+
+@dataclass
+class BookOrderData:
+    """下訂後取得的訂單資料"""
+    ordernum: str
+    trainnum: str
+    traintype: str
+    carriage: str
+    seat: str
 
 
 @dataclass
