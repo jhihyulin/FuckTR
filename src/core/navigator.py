@@ -104,7 +104,7 @@ class Navigator:
                 lambda d: d.current_url == expected_url or d.find_elements(
                     by, value)
             )
-            if self.driver.current_url == expected_url:
+            if self.get_current_url() == expected_url:
                 return 'url'
             else:
                 return 'element'
