@@ -1,6 +1,5 @@
 """主要業務邏輯 (登入、查詢、訂票、查單、退票)"""
 
-import time
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 
@@ -415,4 +414,3 @@ class TRService:
         except Exception as e:
             self.logger.error(f"Error placing order: {e}")
             raise e
-        return False

@@ -1,13 +1,8 @@
 """臺鐵訂單測試"""
 
 import pytest
-import time
 
-from src.core.driver import DriverManager
-from src.models.schemas import DriverConfig
 from src.services.tr_service import TRService
-from src.core.navigator import Navigator
-from src.models.schemas import OrderSeatPreference, BookOrderData
 
 
 @pytest.mark.tr_order_wait_pay

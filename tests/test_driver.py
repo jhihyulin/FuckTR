@@ -2,10 +2,6 @@
 
 import pytest
 
-from src.core.driver import DriverManager
-from src.core.navigator import Navigator
-from src.models.schemas import DriverConfig
-
 
 @pytest.mark.smoke
 @pytest.mark.timeout(60)

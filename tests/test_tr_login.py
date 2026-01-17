@@ -1,10 +1,7 @@
 """臺鐵登入測試"""
 
 import pytest
-import os
-from dotenv import load_dotenv
 
-from src.core.driver import DriverManager
 from src.models.schemas import DriverConfig
 from src.services.tr_service import TRService
 from src.core.navigator import Navigator

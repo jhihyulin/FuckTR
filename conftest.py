@@ -26,9 +26,6 @@ def pytest_configure(config):
 @pytest.fixture()
 def driver_fixture():
     """提供 WebDriver 實例的共用 fixture"""
-    from src.core.driver import DriverManager
-    from src.models.schemas import DriverConfig
-
     config = DriverConfig(headless=False)
     with DriverManager(config=config) as driver:
         yield driver
