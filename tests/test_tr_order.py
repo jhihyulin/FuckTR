@@ -1,13 +1,15 @@
 """臺鐵訂單測試"""
 
+import time
 import pytest
 
+from src.models.schemas import BookOrderData, OrderSeatPreference
 from src.services.tr_service import TRService
 
 
 @pytest.mark.tr_order_wait_pay
 @pytest.mark.timeout(120)
-def test_tr_order_wait_pay(login_fixture):
+def test_tr_order_wait_pay(login_fixture: TRService):
     """測試取得待付款訂單"""
     tr_service: TRService = login_fixture
     orders = tr_service.fetch_order_wait_pay()
@@ -22,7 +24,7 @@ def test_tr_order_wait_pay(login_fixture):
 
 @pytest.mark.tr_order_cancel
 @pytest.mark.timeout(180)
-def test_tr_order_cancel(login_fixture):
+def test_tr_order_cancel(login_fixture: TRService):
     """測試取消待付款訂單"""
     tr_service: TRService = login_fixture
     orders = tr_service.fetch_order_wait_pay()
@@ -36,7 +38,7 @@ def test_tr_order_cancel(login_fixture):
 
 @pytest.mark.tr_order_cancel_invalid
 @pytest.mark.timeout(120)
-def test_tr_order_cancel_invalid(login_fixture):
+def test_tr_order_cancel_invalid(login_fixture: TRService):
     """測試取消不存在的訂單"""
     tr_service: TRService = login_fixture
     invalid_order_num = "9999999"  # 假設此訂單號碼不存在
@@ -48,7 +50,7 @@ def test_tr_order_cancel_invalid(login_fixture):
 
 @pytest.mark.tr_order_cancel_list
 @pytest.mark.timeout(300)
-def test_tr_order_cancel_list(login_fixture):
+def test_tr_order_cancel_list(login_fixture: TRService):
     """測試批次取消待付款訂單"""
     tr_service: TRService = login_fixture
     orders = tr_service.fetch_order_wait_pay()
@@ -62,7 +64,7 @@ def test_tr_order_cancel_list(login_fixture):
 
 @pytest.mark.tr_order_with_trainnum
 @pytest.mark.timeout(180)
-def test_tr_order_with_trainnum(login_fixture):
+def test_tr_order_with_trainnum(login_fixture: TRService):
     """測試取得指定車次的待付款訂單"""
     tr_service: TRService = login_fixture
     start_station = "1000-臺北"
