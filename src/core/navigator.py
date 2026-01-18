@@ -56,8 +56,9 @@ class Navigator:
     def scroll_to(self, locator: Locator, timeout: Optional[int] = None):
         try:
             el = self.wait_for(locator, timeout)
+            # 使用 block: "center" 避免被頂部固定的 AppBar 遮住
             self.driver.execute_script(
-                "arguments[0].scrollIntoView(true);", el)
+                "arguments[0].scrollIntoView({block: 'center', behavior: 'auto'});", el)
             return el
         except TimeoutException as exc:
             self.logger.error(f"Scroll to timeout: {locator}")
@@ -78,8 +79,9 @@ class Navigator:
             WebDriverWait(self.driver, self.default_wait).until(
                 EC.element_to_be_clickable(element)
             )
+            # 使用 block: "center" 避免被頂部固定的 AppBar 遮住
             self.driver.execute_script(
-                "arguments[0].scrollIntoView(true);", element)
+                "arguments[0].scrollIntoView({block: 'center', behavior: 'auto'});", element)
             element.click()
             return element
         except TimeoutException as exc:
