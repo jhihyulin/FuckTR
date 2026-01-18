@@ -57,7 +57,7 @@ class RetryPolicy:
 @dataclass
 class DriverConfig:
     headless: bool = False
-    window_size: Tuple[int, int] = (1280, 800)
+    window_size: Tuple[int, int] = (720, 960)
     user_agent: Optional[str] = None
     download_dir: Optional[str] = None
     timeouts: Timeouts = field(default_factory=Timeouts)

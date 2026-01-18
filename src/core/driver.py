@@ -43,6 +43,9 @@ class DriverManager(AbstractContextManager):
                 self.logger.info(f"Starting Chrome (attempt {attempt})")
                 driver = uc.Chrome(options=options)
                 self._apply_timeouts(driver)
+                # 強制設定視窗大小
+                w, h = self.config.window_size
+                driver.set_window_size(w, h)
                 self.driver = driver
                 self.logger.info("Chrome started successfully")
                 return self.driver
