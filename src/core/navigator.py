@@ -5,7 +5,7 @@ import random
 import logging
 from typing import Optional, Tuple
 
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
@@ -70,6 +70,10 @@ class Navigator:
             self.scroll_to(locator, timeout)
             el.click()
             return el
+        except ElementClickInterceptedException:
+            self.logger.warning(
+                f"Element click intercepted for {locator}, using JavaScript click")
+            return self.click_js(locator, timeout)
         except TimeoutException as exc:
             self.logger.error(f"Click timeout: {locator}")
             raise exc
@@ -84,8 +88,23 @@ class Navigator:
                 "arguments[0].scrollIntoView({block: 'center', behavior: 'auto'});", element)
             element.click()
             return element
+        except ElementClickInterceptedException:
+            self.logger.warning(
+                "Element click intercepted, using JavaScript click")
+            self.driver.execute_script("arguments[0].click();", element)
+            return element
         except TimeoutException as exc:
             self.logger.error("Click element timeout")
+            raise exc
+
+    def click_js(self, locator: Locator, timeout: Optional[int] = None):
+        """使用 JavaScript 點擊元素（用於處理被覆蓋的元素）"""
+        try:
+            el = self.wait_for(locator, timeout)
+            self.driver.execute_script("arguments[0].click();", el)
+            return el
+        except TimeoutException as exc:
+            self.logger.error(f"Click JS timeout: {locator}")
             raise exc
 
     def fill(self, locator: Locator, text: str, clear: bool = True, timeout: Optional[int] = None):
