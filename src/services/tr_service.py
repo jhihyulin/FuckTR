@@ -305,7 +305,7 @@ class TRService:
             # 等 id errorDiv 出現或或跳 https://www.railway.gov.tw/tra-tip-web/tip/tip001/tip123/queryTrain
             result = self.navigator.wait_for_url_or_element(
                 "https://www.railway.gov.tw/tra-tip-web/tip/tip001/tip123/queryTrain",
-                Navigator.by_css("#errorDiv"), timeout=10)
+                Navigator.by_xpath("//*[@id='errorDiv' and not(contains(@style,'display: none'))]"), timeout=10)
             if result != 'url':
                 # 訂票失敗，取得錯誤訊息
                 error_msg = self.navigator.get_element_text(

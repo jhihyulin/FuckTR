@@ -53,9 +53,20 @@ class Navigator:
         by, value = locator
         return WebDriverWait(self.driver, to).until(EC.element_to_be_clickable((by, value)))
 
+    def scroll_to(self, locator: Locator, timeout: Optional[int] = None):
+        try:
+            el = self.wait_for(locator, timeout)
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView(true);", el)
+            return el
+        except TimeoutException as exc:
+            self.logger.error(f"Scroll to timeout: {locator}")
+            raise exc
+
     def click(self, locator: Locator, timeout: Optional[int] = None):
         try:
             el = self.wait_clickable(locator, timeout)
+            self.scroll_to(locator, timeout)
             el.click()
             return el
         except TimeoutException as exc:
@@ -67,6 +78,8 @@ class Navigator:
             WebDriverWait(self.driver, self.default_wait).until(
                 EC.element_to_be_clickable(element)
             )
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView(true);", element)
             element.click()
             return element
         except TimeoutException as exc:
