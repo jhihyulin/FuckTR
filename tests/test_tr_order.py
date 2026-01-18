@@ -30,7 +30,7 @@ def test_tr_order_cancel(login_fixture: TRService):
     orders = tr_service.fetch_order_wait_pay()
     if not orders:
         pytest.skip("無待付款訂單可供測試取消")
-    order_to_cancel = orders[0]
+    order_to_cancel = orders[-1]
     result = tr_service.cancel_order_with_ordernum(order_to_cancel)
     assert result is True
     print(f"已取消訂單代碼: {order_to_cancel}")
